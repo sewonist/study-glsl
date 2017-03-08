@@ -57,22 +57,28 @@ float ring(vec2 uv, float r, float b){
 void main(){
     vec2 uv = -1.+2.*v_texcoord;
     vec2 st = gl_FragCoord.xy/resolution;
-    vec3 color = vec3(1.);
-    // Use polar coordinates instead of cartesian
+    vec3 color = vec3(0.);
+    
     vec2 toCenter = vec2(0.5,0.5)-st;
     float angle = atan(toCenter.y,toCenter.x);
-    float radius = length(toCenter)*2.0;
-  
-    // Map the angle (-PI to PI) to the Hue (from 0 to 1)
-    // and the Saturation to the radius
+    float radius = length(toCenter)*2.0; 
     //color = hsb2rgb(vec3((angle/TWO_PI),radius,1.0));
     
-
+    vec2 uv2 = uv;
     float i = 1.;
+    //uv.x += sin(time*2.+uv.y*8.)*spectrum.x*100.;
     for(i=1.;i<2.;i++){
-        float c = ring(uv, mod(time*(sin(i)), 8.*sin(i)), .1);
-        color *= vec3(c);
+        float c = ring(uv, mod(time*(sin(i))*1.5, 8.*sin(i)), .1*spectrum.y*100.);
+        color += vec3(c);
+
+        float l = abs(1./uv.x) * spectrum.x * 10.;
+        //color += vec3(l);
     }
+    
+    float b = step(.9,fract(uv2.x*10.));
+    b += step(.9,fract(uv2.y*10.));
+//color.z += b*abs(sin(time));
+
     gl_FragColor = vec4(color,1.0);
 }
 
